@@ -21,7 +21,7 @@ allprojects {
 
 subprojects {
 
-    def isAppModule = it.name.equals('app')
+    def isAppModule = it.name.equals('app') || it.name.equals('testapk')
 
     apply plugin: isAppModule? 'com.android.application': 'com.android.library'
 
@@ -33,9 +33,6 @@ subprojects {
         buildToolsVersion _android.buildToolsVersion as String
 
         defaultConfig {
-            if(isAppModule)
-                applicationId "com.fashare.dl"
-
             minSdkVersion _android.minSdkVersion as Integer
             targetSdkVersion _android.targetSdkVersion as Integer
             versionCode _android.versionCode as Integer
@@ -57,7 +54,6 @@ subprojects {
     dependencies {
         // kotlin
         compile _kotlin.kotlin_stdlib
-        kapt databindingCompiler
 
         // rxjava
         compile rx.rxjava2

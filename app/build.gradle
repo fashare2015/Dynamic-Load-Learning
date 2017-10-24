@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 
+android {
+    defaultConfig {
+        applicationId "com.fashare.app"
+    }
+}
+
 dependencies {
+    compile project(":dl")
     compile support.appcompat
-    compile joor
 }
