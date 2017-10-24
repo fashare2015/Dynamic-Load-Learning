@@ -15,6 +15,12 @@
         android:text="load static method"/>
 
     <Button
+        android:id="@+id/btn_goto_second"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="goto second activity"/>
+
+    <Button
         android:id="@+id/btn_load_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

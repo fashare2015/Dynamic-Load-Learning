@@ -1,5 +1,7 @@
 package com.fashare.dl
 
+import android.app.Activity
+import android.app.Instrumentation
 import android.content.Context
 import android.net.Uri
 import dalvik.system.DexClassLoader
@@ -13,15 +15,21 @@ import org.joor.Reflect
  * </pre>
  */
 object DL{
-    @Throws(Exception:: class)
-    fun loadDex(context: Context, uri: Uri){
-        val dl = DexClassLoader(
+    lateinit var dl: DexClassLoader
+
+    fun init(context: Context, uri: Uri){
+        dl = DexClassLoader(
                 uri.path,
                 context.cacheDir.path,
                 null,
                 context.classLoader)
-        dl.loadClass("com.fashare.testapk.Test").apply {
-            Reflect.on(this).call("sayHello", context)
+    }
+
+    fun replaceIntrumentation(activity: Activity){
+        Reflect.on(activity).field("mMainThread").apply {
+            val activityThread = this
+            val base = activityThread.get<Instrumentation>("mInstrumentation")
+            activityThread.set("mInstrumentation", InstrumentationProxy(base))
         }
     }
 }
