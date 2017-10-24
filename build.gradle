@@ -1,14 +1,15 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
+    apply from: "ext.gradle"
+
     repositories {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath _android.plugin
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath _kotlin.kotlin_gradle_plugin
+        classpath _kotlin.kotlin_android_extensions
     }
 }
 
@@ -18,6 +19,48 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+subprojects {
+
+    def isAppModule = it.name.equals('app')
+
+    apply plugin: isAppModule? 'com.android.application': 'com.android.library'
+
+    apply plugin: 'kotlin-android'
+    apply plugin: 'kotlin-android-extensions'   // 拓展
+
+    android {
+        compileSdkVersion _android.compileSdkVersion as Integer
+        buildToolsVersion _android.buildToolsVersion as String
+
+        defaultConfig {
+            if(isAppModule)
+                applicationId "com.fashare.dl"
+
+            minSdkVersion _android.minSdkVersion as Integer
+            targetSdkVersion _android.targetSdkVersion as Integer
+            versionCode _android.versionCode as Integer
+            versionName _android.versionName as String
+        }
+
+        buildTypes {
+            release {
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            }
+        }
+
+        sourceSets {
+            main.java.srcDirs += 'src/main/kotlin'
+        }
+    }
+
+    dependencies {
+        // kotlin
+        compile _kotlin.kotlin_stdlib
+        kapt databindingCompiler
+
+        // rxjava
+        compile rx.rxjava2
+        compile rx.rxandroid2
+    }
 }
