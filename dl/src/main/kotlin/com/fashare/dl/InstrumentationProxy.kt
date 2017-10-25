@@ -34,14 +34,29 @@ class InstrumentationProxy(val base: Instrumentation): Instrumentation(), Instru
     override fun execStartActivity(
             who: Context, contextThread: IBinder, token: IBinder, target: Activity,
             intent: Intent, requestCode: Int, options: Bundle): ActivityResult? {
-        logd("execStartActivity: " + target.javaClass.canonicalName)
+        logd("execStartActivity long: " + target.javaClass.canonicalName)
 
         return try {
             Reflect.on(base).call("execStartActivity",
                     who, contextThread, token, target,
                     intent, requestCode, options).get<ActivityResult?>()
         } catch (e: Exception){
-            loge("execStartActivity: " + e.toString())
+            loge("execStartActivity long: " + e.toString())
+            null
+        }
+    }
+
+    override fun execStartActivity(
+            who: Context, contextThread: IBinder, token: IBinder, target: Activity,
+            intent: Intent, requestCode: Int): ActivityResult? {
+        logd("execStartActivity short: " + target.javaClass.canonicalName)
+
+        return try {
+            Reflect.on(base).call("execStartActivity",
+                    who, contextThread, token, target,
+                    intent, requestCode).get<ActivityResult?>()
+        } catch (e: Exception){
+            loge("execStartActivity short: " + e.toString())
             null
         }
     }
@@ -55,7 +70,7 @@ interface InstrumentationInternal {
             who: Context, contextThread: IBinder, token: IBinder, target: Activity,
             intent: Intent, requestCode: Int, options: android.os.Bundle): Instrumentation.ActivityResult?
 
-//    fun execStartActivity(
-//            who: Context, contextThread: IBinder, token: IBinder, target: Activity,
-//            intent: Intent, requestCode: Int): Instrumentation.ActivityResult?
+    fun execStartActivity(
+            who: Context, contextThread: IBinder, token: IBinder, target: Activity,
+            intent: Intent, requestCode: Int): Instrumentation.ActivityResult?
 }

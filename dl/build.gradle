@@ -2,9 +2,5 @@ apply plugin: 'com.android.library'
 
 dependencies {
     compile joor
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile support.appcompat
 }
-
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'

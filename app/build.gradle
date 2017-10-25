@@ -9,8 +9,4 @@ android {
 dependencies {
     compile project(":dl")
     compile support.appcompat
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
-
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
