@@ -18,9 +18,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val file = File(Environment.getExternalStorageDirectory(), "testapk.dex")
+        val file = File(Environment.getExternalStorageDirectory(), "testapk-no-res.apk")
         try {
-            FileUtil.writeBytesToFile(assets.open("testapk.dex"), file)
+            FileUtil.writeBytesToFile(assets.open("testapk-no-res.apk"), file)
         }catch (e: Exception){
             loge(e)
         }
@@ -38,16 +38,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById(R.id.btn_goto_second).setOnClickListener {
-            startActivity(Intent(this, SecondActivity::class.java))
+//            startActivity(Intent(this, SecondActivity::class.java))
 
-//            try {
-//                DL.dl.loadClass("com.fashare.testapk.MainActivity").apply {
-//                    toast(this.canonicalName)
-//                    startActivity(Intent(this@MainActivity, this))
-//                }
-//            }catch (e: Exception){
-//                loge(e)
-//            }
+            try {
+                DL.dl.loadClass("com.fashare.testapk.MainActivity").apply {
+                    toast(this.canonicalName)
+                    startActivity(Intent(this@MainActivity, this))
+                }
+            }catch (e: Exception){
+                loge(e)
+            }
         }
 
         findViewById(R.id.btn_load_activity).setOnClickListener {

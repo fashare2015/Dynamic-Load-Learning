@@ -29,6 +29,8 @@
         </activity>
         <activity android:name=".SecondActivity">
         </activity>
+
+        <activity android:name="com.fashare.testapk.MainActivity"/>
     </application>
 
 </manifest>
