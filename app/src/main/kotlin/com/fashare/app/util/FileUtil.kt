@@ -5,13 +5,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 
-/**
- * <pre>
- *     author : jinliangshan
- *     e-mail : jinliangshan@chexiang.com
- *     desc   :
- * </pre>
- */
 object FileUtil{
     fun writeBytesToFile(inputStream: InputStream, file: File) {
         var fos: FileOutputStream? = null

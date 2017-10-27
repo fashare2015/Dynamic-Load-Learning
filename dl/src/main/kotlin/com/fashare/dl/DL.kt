@@ -1,6 +1,5 @@
 package com.fashare.dl
 
-import android.app.Activity
 import android.app.Instrumentation
 import android.content.Context
 import android.net.Uri
@@ -8,16 +7,16 @@ import dalvik.system.DexClassLoader
 import org.joor.Reflect
 
 /**
- * <pre>
- *     author : jinliangshan
- *     e-mail : jinliangshan@chexiang.com
- *     desc   :
- * </pre>
+ * 动态加载（门面类）
  */
 object DL{
     lateinit var dl: DexClassLoader
+    lateinit var instrumentation: Instrumentation
 
-    fun init(context: Context, uri: Uri){
+    /**
+     * 加载 sdcard 上的 未安装的 apk
+     */
+    fun loadApk(context: Context, uri: Uri){
         dl = DexClassLoader(
                 uri.path,
                 context.cacheDir.path,
@@ -25,11 +24,15 @@ object DL{
                 context.classLoader)
     }
 
-    fun replaceIntrumentation(activity: Activity){
-        Reflect.on(activity).field("mMainThread").apply {
+    /**
+     * 替换 ActivityThread.mInstrumentation
+     */
+    fun replaceInstrumentation(){
+        Reflect.on("android.app.ActivityThread").call("currentActivityThread").apply {
             val activityThread = this
             val base = activityThread.get<Instrumentation>("mInstrumentation")
-            activityThread.set("mInstrumentation", InstrumentationProxy(base))
+            instrumentation = InstrumentationProxy(base)
+            activityThread.set("mInstrumentation", instrumentation)
         }
     }
 }

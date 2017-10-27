@@ -15,14 +15,9 @@
         android:text="load static method"/>
 
     <Button
-        android:id="@+id/btn_goto_second"
+        android:id="@+id/btn_goto_test_apk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="goto second activity"/>
+        android:text="goto testapk"/>
 
-    <Button
-        android:id="@+id/btn_load_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="load activity"/>
 </LinearLayout>
