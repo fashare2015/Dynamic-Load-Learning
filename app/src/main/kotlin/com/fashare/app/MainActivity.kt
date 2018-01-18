@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById(R.id.btn_load_static_method).setOnClickListener {
             try {
-                DL.dl.loadClass("com.fashare.testapk.Test").apply {
+                DL.dexClassLoader.loadClass("com.fashare.testapk.Test").apply {
                     Reflect.on(this).call("sayHello", it.context)
                 }
             }catch (e: Exception){
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById(R.id.btn_goto_test_apk).setOnClickListener {
             try {
-                DL.dl.loadClass("com.fashare.testapk.MainActivity").apply {
+                DL.dexClassLoader.loadClass("com.fashare.testapk.MainActivity").apply {
 
                     startActivity(Intent(this@MainActivity, this))
                 }

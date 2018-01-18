@@ -13,12 +13,14 @@ class App: Application(){
         super.onCreate()
         DL.replaceInstrumentation()
 
-        val file = File(Environment.getExternalStorageDirectory(), "testapk-no-res.apk")
+        val pluginFile = File(Environment.getExternalStorageDirectory(), "testapk-with-res.apk")
         try {
-            FileUtil.writeBytesToFile(assets.open("testapk-no-res.apk"), file)
+            FileUtil.writeBytesToFile(assets.open("testapk-with-res.apk"), pluginFile)
         }catch (e: Exception){
             loge(e)
         }
-        DL.loadApk(this, Uri.fromFile(file))
+        DL.addAssetPath(this, pluginFile.path)
+
+        DL.loadApk(this, Uri.fromFile(pluginFile))
     }
 }

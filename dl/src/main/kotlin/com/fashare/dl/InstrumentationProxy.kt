@@ -22,7 +22,7 @@ class InstrumentationProxy(val base: Instrumentation): Instrumentation(){
     override fun newActivity(cl: ClassLoader?, className: String?, intent: Intent?): Activity? {
         logd("newActivity short: " + className)
         return (mIntentProxy?.base?: intent)?.let {
-            base.newActivity(DL.dl, it.component?.className, it)
+            base.newActivity(DL.dexClassLoader, it.component?.className, it)
         }
     }
 
