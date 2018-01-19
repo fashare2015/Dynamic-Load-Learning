@@ -13,7 +13,7 @@ import org.joor.Reflect
 /**
  * Instrumentation 代理类
  */
-class InstrumentationProxy(val base: Instrumentation): Instrumentation(){
+class InstrumentationProxy(val base: Instrumentation) : Instrumentation() {
     var mIntentProxy: IntentProxy? = null
 
     /**
@@ -21,7 +21,7 @@ class InstrumentationProxy(val base: Instrumentation): Instrumentation(){
      */
     override fun newActivity(cl: ClassLoader?, className: String?, intent: Intent?): Activity? {
         logd("newActivity short: " + className)
-        return (mIntentProxy?.base?: intent)?.let {
+        return (mIntentProxy?.base ?: intent)?.let {
             base.newActivity(DL.dexClassLoader, it.component?.className, it)
         }
     }
@@ -40,9 +40,38 @@ class InstrumentationProxy(val base: Instrumentation): Instrumentation(){
             Reflect.on(base).call("execStartActivity",
                     who, contextThread, token, target,
                     mIntentProxy, requestCode, options).get<ActivityResult?>()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             loge("execStartActivity long: " + e.toString())
             null
         }
+    }
+
+    override fun callActivityOnCreate(activity: Activity?, icicle: Bundle?) {
+        if (isFromPlugin(activity)) {
+            val pluginRes = PluginResources(activity?.resources)
+            try {
+                Reflect.on(activity?.baseContext).set("mResources", pluginRes)
+                Reflect.on(activity).set("mResources", pluginRes)
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            try {
+                Reflect.on(activity?.baseContext).field("mPackageInfo")   // get LoadedApk
+                        .set("mClassLoader", DL.dexClassLoader)
+
+                Reflect.on(pluginRes).set("mClassLoader", DL.dexClassLoader)
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        base.callActivityOnCreate(activity, icicle)
+    }
+
+    private fun isFromPlugin(activity: Activity?): Boolean {
+        return activity?.javaClass?.canonicalName?.startsWith("com.fashare.testapk") ?: false
     }
 }

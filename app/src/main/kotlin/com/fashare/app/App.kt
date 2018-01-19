@@ -19,7 +19,6 @@ class App: Application(){
         }catch (e: Exception){
             loge(e)
         }
-        DL.addAssetPath(this, pluginFile.path)
 
         DL.loadApk(this, Uri.fromFile(pluginFile))
     }
