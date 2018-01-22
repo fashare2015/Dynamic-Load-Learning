@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity
 /**
  * Intent 代理类，替换 component.className 为 StubActivity
  */
-class IntentProxy(var base: Intent?): Intent(){
+internal class IntentProxy(var base: Intent?) : Intent() {
     init {
         component = ComponentName(base?.component?.packageName, StubActivity::class.java.name)
     }
@@ -16,4 +16,4 @@ class IntentProxy(var base: Intent?): Intent(){
 /**
  * 占坑用 Activity
  */
-class StubActivity : AppCompatActivity()
+internal class StubActivity : AppCompatActivity()

@@ -11,7 +11,7 @@ import org.joor.Reflect
  */
 object DL {
     lateinit var dexClassLoader: DexClassLoader
-    lateinit var instrumentation: Instrumentation
+    internal lateinit var instrumentation: Instrumentation
 
     /**
      * 加载 sdcard 上的 未安装的 apk
@@ -34,14 +34,5 @@ object DL {
             instrumentation = InstrumentationProxy(base)
             activityThreadRef.set("mInstrumentation", instrumentation)
         }
-    }
-
-    /**
-     * 加载插件 apk 里的资源
-     *
-     * @param assetPath 插件 apk 路径
-     */
-    fun addAssetPath(context: Context, assetPath: String) {
-        Reflect.on(context.assets).call("addAssetPath", assetPath)
     }
 }

@@ -13,7 +13,7 @@ import org.joor.Reflect
 /**
  * Instrumentation 代理类
  */
-class InstrumentationProxy(val base: Instrumentation) : Instrumentation() {
+internal class InstrumentationProxy(val base: Instrumentation) : Instrumentation() {
     var mIntentProxy: IntentProxy? = null
 
     /**
@@ -28,6 +28,8 @@ class InstrumentationProxy(val base: Instrumentation) : Instrumentation() {
 
     /**
      * start 之前，替换 Intent 为 已注册的 StubActivity, 以绕过 系统对 manifest 的检查
+     *
+     * 注: 这里其实也是 override, 只是 super.execStartActivity(...) 为 @hide, 所以看起来比较奇怪.
      */
     fun execStartActivity(
             who: Context?, contextThread: IBinder?, token: IBinder?, target: Activity?,
@@ -46,21 +48,30 @@ class InstrumentationProxy(val base: Instrumentation) : Instrumentation() {
         }
     }
 
+    /**
+     * 这里主要处理资源的加载, 包括图片等资源文件以及 R.java
+     */
     override fun callActivityOnCreate(activity: Activity?, icicle: Bundle?) {
         if (isFromPlugin(activity)) {
             val pluginRes = PluginResources(activity?.resources)
+            // hack 各处的 mResources, 以便从插件读资源文件
             try {
+                // 替换 ContextImpl.mResources 为 pluginRes
                 Reflect.on(activity?.baseContext).set("mResources", pluginRes)
+                // 替换 ContextThemeWrapper.mResources 为 pluginRes
                 Reflect.on(activity).set("mResources", pluginRes)
 
             } catch (e: Exception) {
                 e.printStackTrace()
             }
 
+            // hack 各处的 mClassLoader, 以便从插件读 R.java. 这步不做的话，默认从宿主读取，会找不到资源.
             try {
+                // 替换 ContextImpl.getClassLoader() 为 DL.dexClassLoader
                 Reflect.on(activity?.baseContext).field("mPackageInfo")   // get LoadedApk
                         .set("mClassLoader", DL.dexClassLoader)
 
+                // 替换 PluginResources.mClassLoader 为 DL.dexClassLoader
                 Reflect.on(pluginRes).set("mClassLoader", DL.dexClassLoader)
 
             } catch (e: Exception) {
@@ -71,6 +82,9 @@ class InstrumentationProxy(val base: Instrumentation) : Instrumentation() {
         base.callActivityOnCreate(activity, icicle)
     }
 
+    /**
+     * 是插件 apk 中的 Activity
+     */
     private fun isFromPlugin(activity: Activity?): Boolean {
         return activity?.javaClass?.canonicalName?.startsWith("com.fashare.testapk") ?: false
     }
