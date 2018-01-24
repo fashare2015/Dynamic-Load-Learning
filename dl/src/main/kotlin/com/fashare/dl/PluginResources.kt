@@ -17,8 +17,8 @@ internal class PluginResources(hostResources: Resources?) : Resources(createAsse
          * 调用 AssetManager.addAssetPath(pluginFile.path). 以便从插件中加载资源.
          */
         private fun createAssetManager(hostResources: Resources?): AssetManager {
-//            val assetManager = AssetManager::class.java.newInstance()
-            val assetManager = hostResources?.assets!!
+            val assetManager = AssetManager::class.java.newInstance()
+//            val assetManager = hostResources?.assets!!
             val pluginFile = File(Environment.getExternalStorageDirectory(), "testapk-with-res.apk")
             Reflect.on(assetManager).call("addAssetPath", pluginFile.path)
             return assetManager

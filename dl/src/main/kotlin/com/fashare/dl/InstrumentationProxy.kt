@@ -22,6 +22,7 @@ internal class InstrumentationProxy(val base: Instrumentation) : Instrumentation
     override fun newActivity(cl: ClassLoader?, className: String?, intent: Intent?): Activity? {
         logd("newActivity short: " + className)
         return (mIntentProxy?.base ?: intent)?.let {
+            mIntentProxy = null
             base.newActivity(DL.dexClassLoader, it.component?.className, it)
         }
     }
@@ -54,17 +55,6 @@ internal class InstrumentationProxy(val base: Instrumentation) : Instrumentation
     override fun callActivityOnCreate(activity: Activity?, icicle: Bundle?) {
         if (isFromPlugin(activity)) {
             val pluginRes = PluginResources(activity?.resources)
-            // hack 各处的 mResources, 以便从插件读资源文件
-            try {
-                // 替换 ContextImpl.mResources 为 pluginRes
-                Reflect.on(activity?.baseContext).set("mResources", pluginRes)
-                // 替换 ContextThemeWrapper.mResources 为 pluginRes
-                Reflect.on(activity).set("mResources", pluginRes)
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
             // hack 各处的 mClassLoader, 以便从插件读 R.java. 这步不做的话，默认从宿主读取，会找不到资源.
             try {
                 // 替换 ContextImpl.getClassLoader() 为 DL.dexClassLoader
@@ -77,6 +67,24 @@ internal class InstrumentationProxy(val base: Instrumentation) : Instrumentation
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+
+            val pluginTheme = pluginRes.newTheme()
+            pluginTheme.applyStyle(android.R.style.Theme_Light, false)
+
+            // hack 各处的 mResources, 以便从插件读资源文件
+            try {
+                // 替换 ContextImpl.mResources 为 pluginRes
+                Reflect.on(activity?.baseContext).set("mResources", pluginRes)
+                        .set("mTheme", pluginTheme)
+                // 替换 ContextThemeWrapper.mResources 为 pluginRes
+                Reflect.on(activity).set("mResources", pluginRes)
+                        .set("mTheme", pluginTheme)
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+
         }
 
         base.callActivityOnCreate(activity, icicle)

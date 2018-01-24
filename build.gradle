@@ -34,7 +34,7 @@ subprojects {
 
         defaultConfig {
             minSdkVersion _android.minSdkVersion as Integer
-            targetSdkVersion _android.targetSdkVersion as Integer
+            targetSdkVersion 22 // 未处理6.0权限，直接写死 22
             versionCode _android.versionCode as Integer
             versionName _android.versionName as String
         }
