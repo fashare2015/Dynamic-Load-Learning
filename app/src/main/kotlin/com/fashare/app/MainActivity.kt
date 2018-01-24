@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById(R.id.btn_goto_test_apk).setOnClickListener {
             try {
-                DL.dexClassLoader.loadClass("com.fashare.testapk.MainActivity").apply {
+                DL.dexClassLoader.loadClass("com.fashare.testapk.PluginActivity").apply {
 
                     startActivity(Intent(this@MainActivity, this))
                 }
