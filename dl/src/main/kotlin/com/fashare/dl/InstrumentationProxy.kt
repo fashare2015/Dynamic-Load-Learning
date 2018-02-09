@@ -35,20 +35,10 @@ internal class IntentProxy(var base: Intent?) : Intent() {
  * 插件专用的 Resources. 从插件apk中读取资源, 不再从宿主apk读取.
  */
 internal class PluginResources(hostResources: Resources?)
-    : Resources(createAssetManager(hostResources), hostResources?.displayMetrics, hostResources?.configuration) {
-
-    companion object {
-        /**
-         * 调用 AssetManager.addAssetPath(pluginFile.path). 以便从插件中加载资源.
-         */
-        private fun createAssetManager(hostResources: Resources?): AssetManager {
-            val assetManager = AssetManager::class.java.newInstance()
-            val pluginFile = File(Environment.getExternalStorageDirectory(), "testapk-with-res.apk")
-            Reflect.on(assetManager).call("addAssetPath", pluginFile.path)
-            return assetManager
-        }
-    }
-}
+    : Resources(AssetManager::class.java.newInstance().apply {
+    val pluginFile = File(Environment.getExternalStorageDirectory(), "testapk-with-res.apk")
+    Reflect.on(this).call("addAssetPath", pluginFile.path)
+}, hostResources?.displayMetrics, hostResources?.configuration)
 
 /**
  * Instrumentation 代理类
@@ -101,7 +91,8 @@ internal class InstrumentationProxy(val base: Instrumentation) : Instrumentation
         // hack 各处的 mClassLoader, 以便从插件读 R.java . 这步不做的话，默认从宿主读取，会找不到 R.xxx.xxx .
         try {
             // 替换 ContextImpl.getClassLoader() 为 DL.dexClassLoader
-            Reflect.on(activity?.baseContext).field("mPackageInfo")   // get LoadedApk
+            Reflect.on(activity?.baseContext)
+                    .field("mPackageInfo")   // get LoadedApk
                     .set("mClassLoader", DL.dexClassLoader)
 
             // 替换 PluginResources.mClassLoader 为 DL.dexClassLoader
@@ -115,7 +106,7 @@ internal class InstrumentationProxy(val base: Instrumentation) : Instrumentation
             val pluginThemeId = Reflect.on(Resources::class.java)
                     .call("selectDefaultTheme", 0, Build.VERSION.SDK_INT)
                     .get<Int>()
-            this.applyStyle(pluginThemeId, false)
+            applyStyle(pluginThemeId, false)
         }
 
         // hack 各处的 mResources, mTheme, 以便从插件读资源文件
