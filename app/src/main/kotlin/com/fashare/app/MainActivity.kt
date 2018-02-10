@@ -4,8 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.fashare.dl.DL
-import com.fashare.dl.extension.loge
-import com.fashare.dl.extension.toast
+import com.fashare.dl.loge
+import com.fashare.dl.toast
 import org.joor.Reflect
 
 class MainActivity : AppCompatActivity() {
